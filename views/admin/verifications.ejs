@@ -1,0 +1,49 @@
+<%- include('../partials/header') %>
+
+<section class="page-header">
+  <h1>🪪 Verifications</h1>
+</section>
+
+<!-- FILTER TABS -->
+<div class="filter-tabs">
+  <a href="?status=all" class="tab <%= filter === 'all' ? 'active' : '' %>">All</a>
+  <a href="?status=pending" class="tab <%= filter === 'pending' ? 'active' : '' %>">Pending</a>
+  <a href="?status=approved" class="tab <%= filter === 'approved' ? 'active' : '' %>">Approved</a>
+  <a href="?status=rejected" class="tab <%= filter === 'rejected' ? 'active' : '' %>">Rejected</a>
+</div>
+
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Full Name</th>
+        <th>Course / Year</th>
+        <th>Contact</th>
+        <th>Status</th>
+        <th>Submitted</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (verifications.length === 0) { %>
+        <tr><td colspan="7" class="empty-cell">No verifications found.</td></tr>
+      <% } %>
+      <% verifications.forEach(v => { %>
+        <tr>
+          <td><%= v.username %></td>
+          <td><%= v.first_name %> <%= v.last_name %></td>
+          <td><%= v.course %> / <%= v.year_level %></td>
+          <td><%= v.contact_number %></td>
+          <td><span class="badge-status status-<%= v.status %>"><%= v.status %></span></td>
+          <td><%= new Date(v.submitted_at).toLocaleDateString() %></td>
+          <td><a href="/admin/verifications/<%= v.id %>" class="btn btn-sm btn-outline">View</a></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<a href="/admin/dashboard" class="btn btn-outline" style="margin-top:20px">← Dashboard</a>
+
+<%- include('../partials/footer') %>

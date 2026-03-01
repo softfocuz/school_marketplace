@@ -1,0 +1,80 @@
+<%- include('../partials/header') %>
+
+<section class="page-header">
+  <h1>🪪 Review Verification</h1>
+  <a href="/admin/verifications" class="btn btn-outline">← Back</a>
+</section>
+
+<div class="verif-detail-wrap">
+
+  <!-- STATUS BADGE -->
+  <div class="verif-status-banner status-<%= verif.status %>">
+    Status: <strong><%= verif.status.toUpperCase() %></strong>
+    <% if (verif.reviewed_at) { %>
+      — Reviewed on <%= new Date(verif.reviewed_at).toLocaleDateString() %>
+    <% } %>
+  </div>
+
+  <!-- USER INFO -->
+  <div class="detail-grid">
+    <div class="detail-section">
+      <h3>👤 Personal Info</h3>
+      <table class="detail-table">
+        <tr><td>Username</td><td><strong><%= verif.username %></strong></td></tr>
+        <tr><td>Email</td><td><%= verif.email %></td></tr>
+        <tr><td>Full Name</td><td><%= verif.first_name %> <%= verif.last_name %></td></tr>
+        <tr><td>Course</td><td><%= verif.course %></td></tr>
+        <tr><td>Year Level</td><td><%= verif.year_level %></td></tr>
+        <tr><td>Schedule</td><td><%= verif.schedule %></td></tr>
+        <tr><td>Contact</td><td><%= verif.contact_number %></td></tr>
+      </table>
+    </div>
+
+    <div class="detail-section">
+      <h3>📘 Facebook Info</h3>
+      <table class="detail-table">
+        <tr><td>FB Link/Name</td><td><%= verif.facebook_link %></td></tr>
+        <tr><td>Profile Description</td><td><%= verif.facebook_describe %></td></tr>
+      </table>
+
+      <h3 style="margin-top:20px">🪪 Student ID Photo</h3>
+      <% if (verif.student_id_photo) { %>
+        <img src="/uploads/<%= verif.student_id_photo %>" alt="Student ID" class="id-photo">
+      <% } else { %>
+        <p>No photo uploaded.</p>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- ADMIN NOTE (if rejected) -->
+  <% if (verif.admin_note) { %>
+    <div class="info-box info-reject">
+      <strong>Admin Note:</strong> <%= verif.admin_note %>
+    </div>
+  <% } %>
+
+  <!-- ACTION BUTTONS -->
+  <% if (verif.status !== 'approved') { %>
+    <div class="verif-actions">
+      <!-- APPROVE -->
+      <form action="/admin/verifications/<%= verif.id %>/approve" method="POST"
+        onsubmit="return confirm('Approve this verification?')">
+        <button type="submit" class="btn btn-success">✅ Approve</button>
+      </form>
+
+      <!-- REJECT -->
+      <form action="/admin/verifications/<%= verif.id %>/reject" method="POST"
+        onsubmit="return document.getElementById('admin_note').value.trim() !== '' || (alert('Please enter a rejection reason.'), false)">
+        <input type="text" name="admin_note" id="admin_note" placeholder="Reason for rejection..." class="reject-input">
+        <button type="submit" class="btn btn-danger">❌ Reject</button>
+      </form>
+    </div>
+  <% } else { %>
+    <div class="info-box info-success">
+      ✅ This verification has been approved.
+    </div>
+  <% } %>
+
+</div>
+
+<%- include('../partials/footer') %>

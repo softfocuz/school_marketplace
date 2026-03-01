@@ -1,0 +1,56 @@
+<%- include('../partials/header') %>
+
+<section class="page-header">
+  <h1>📋 My Orders</h1>
+</section>
+
+<% if (orders.length === 0) { %>
+  <div class="empty-state">
+    <p>You have no orders yet. <a href="/stores">Start shopping!</a></p>
+  </div>
+<% } else { %>
+  <div class="orders-list">
+    <% orders.forEach(order => { %>
+      <div class="order-card order-<%= order.status %>">
+        <div class="order-header">
+          <div>
+            <span class="order-id">Order #<%= order.id %></span>
+            <span class="order-store">🏪 <%= order.store_name %></span>
+          </div>
+          <div class="order-meta">
+            <span class="order-status status-<%= order.status %>"><%= order.status.toUpperCase() %></span>
+            <span class="order-date"><%= new Date(order.created_at).toLocaleDateString() %></span>
+          </div>
+        </div>
+
+        <div class="order-items">
+          <% order.items.forEach(item => { %>
+            <div class="order-item-line">
+              <span><%= item.product_name %> x<%= item.quantity %></span>
+              <span>₱<%= (item.price_at_order * item.quantity).toFixed(2) %></span>
+            </div>
+          <% }) %>
+        </div>
+
+        <div class="order-footer">
+          <strong>Total: ₱<%= parseFloat(order.total_amount).toFixed(2) %></strong>
+
+          <%# Only show cancel button if order is still pending %>
+          <% if (order.status === 'pending') { %>
+            <form action="/orders/cancel/<%= order.id %>" method="POST"
+              onsubmit="return confirm('Cancel this order?')">
+              <button type="submit" class="btn btn-cancel">Cancel Order</button>
+            </form>
+          <% } %>
+          <%# Show rejection reason if order was rejected by seller %>
+          <% if (order.status === 'rejected' && order.notes) { %>
+            <span style="color:#ef476f; font-size:0.85rem;">❌ Reason: <%= order.notes %></span>
+          <% } %>
+          <%# Once confirmed, order cannot be cancelled — no button shown %>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

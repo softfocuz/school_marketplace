@@ -1,0 +1,104 @@
+<%- include('../partials/header') %>
+
+<div class="store-header">
+  <div class="store-header-icon"><%= store.is_fastfood ? '🍔' : '🛍️' %></div>
+  <div>
+    <h1><%= store.name %></h1>
+    <p><%= store.description || '' %></p>
+    <% if (store.is_fastfood) { %>
+      <span class="badge-fastfood">Fast Food Chain</span>
+    <% } else { %>
+      <span class="badge-student">By: <%= store.seller_name %></span>
+    <% } %>
+  </div>
+</div>
+
+<section>
+  <h2 class="section-title">Products</h2>
+
+  <% if (products.length === 0) { %>
+    <div class="empty-state">
+      <p>No products available yet.</p>
+    </div>
+  <% } else { %>
+    <div class="products-grid">
+      <% products.forEach(product => { %>
+        <div class="product-card">
+
+          <!-- Product image or placeholder -->
+          <% if (product.image) { %>
+            <div class="product-img-real">
+              <img src="/uploads/<%= product.image %>" alt="<%= product.name %>">
+            </div>
+          <% } else { %>
+            <div class="product-img-placeholder">
+              <%= store.is_fastfood ? '🍟' : '📦' %>
+            </div>
+          <% } %>
+
+          <div class="product-body">
+            <h3><%= product.name %></h3>
+            <p><%= product.description || '' %></p>
+
+            <!-- Stock indicator for buyers -->
+            <span class="stock-badge <%= product.stock === 0 ? 'out-of-stock' : product.stock <= 5 ? 'low-stock' : 'in-stock' %>">
+              <%= product.stock === 0 ? '❌ Out of stock' : product.stock <= 5 ? `⚠️ Only ${product.stock} left!` : `✅ ${product.stock} available` %>
+            </span>
+
+            <div class="product-footer" style="margin-top:10px;">
+              <span class="price">₱<%= parseFloat(product.price).toFixed(2) %></span>
+
+              <% if (product.stock === 0) { %>
+                <!-- Disable add to cart if out of stock -->
+                <button class="btn btn-add-cart" disabled
+                  style="opacity:0.5; cursor:not-allowed;">
+                  Out of Stock
+                </button>
+              <% } else if (currentUser) { %>
+                <button class="btn btn-add-cart"
+                  onclick="addToCart(<%= product.id %>, '<%= product.name.replace(/'/g, "\\'") %>') ">
+                  + Add to Cart
+                </button>
+              <% } else { %>
+                <a href="/auth/login" class="btn btn-add-cart">Login to Buy</a>
+              <% } %>
+            </div>
+          </div>
+
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
+
+<!-- TOAST NOTIFICATION -->
+<div id="toast" class="toast hidden"></div>
+
+<script>
+async function addToCart(productId, productName) {
+  const res = await fetch('/orders/cart/add', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ product_id: productId, quantity: 1 })
+  });
+  const data = await res.json();
+  showToast(data.message || 'Added!');
+  if (data.cartCount !== undefined) {
+    const badge = document.querySelector('.cart-badge');
+    if (badge) badge.textContent = data.cartCount;
+    else {
+      const cartBtn = document.querySelector('.cart-btn');
+      if (cartBtn) cartBtn.innerHTML += ` <span class="cart-badge">${data.cartCount}</span>`;
+    }
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('hidden');
+  setTimeout(() => t.classList.add('hidden'), 2500);
+}
+</script>
+
+<%- include('../partials/footer') %>

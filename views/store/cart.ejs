@@ -1,0 +1,131 @@
+<%- include('../partials/header') %>
+
+<section class="page-header">
+  <h1>🛒 Your Cart</h1>
+</section>
+
+<% if (cartItems.length === 0) { %>
+  <div class="empty-state">
+    <p>Your cart is empty. <a href="/stores">Browse stores</a></p>
+  </div>
+<% } else { %>
+
+  <div class="cart-layout">
+    <div class="cart-items">
+      <% cartItems.forEach(item => { %>
+        <div class="cart-item">
+          <div class="cart-item-info">
+            <span class="cart-item-name"><%= item.name %></span>
+            <span class="cart-item-store">from <%= item.store_name %></span>
+          </div>
+          <div class="cart-item-right">
+            <span class="cart-item-price">₱<%= (item.price * item.quantity).toFixed(2) %></span>
+            <span class="cart-item-qty">x<%= item.quantity %></span>
+            <form action="/orders/cart/remove" method="POST" style="display:inline">
+              <input type="hidden" name="cart_item_id" value="<%= item.cart_item_id %>">
+              <button type="submit" class="btn-remove">✕</button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <div class="cart-summary">
+      <h3>Order Summary</h3>
+      <div class="summary-line">
+        <span>Total</span>
+        <strong>₱<%= total.toFixed(2) %></strong>
+      </div>
+      <button id="placeOrderBtn" class="btn btn-primary btn-full">Place Order</button>
+    </div>
+  </div>
+
+<% } %>
+
+<!-- VERIFICATION MODAL -->
+<div id="verifModal" class="modal hidden">
+  <div class="modal-box">
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+document.getElementById('placeOrderBtn')?.addEventListener('click', async () => {
+  const btn = document.getElementById('placeOrderBtn');
+  btn.disabled = true;
+  btn.textContent = 'Checking...';
+
+  try {
+    const res = await fetch('/orders/place', { method: 'POST' });
+    const data = await res.json();
+
+    if (data.success) {
+      // Order placed!
+      document.getElementById('modal-content').innerHTML = `
+        <div class="modal-success">
+          <div class="modal-icon">✅</div>
+          <h3>Order Placed!</h3>
+          <p>Your order has been placed successfully. The store has been notified.</p>
+          <a href="/orders/my-orders" class="btn btn-primary">View My Orders</a>
+        </div>
+      `;
+      document.getElementById('verifModal').classList.remove('hidden');
+    } else if (data.action === 'verify') {
+      // Never verified — show verification form prompt
+      document.getElementById('modal-content').innerHTML = `
+        <div class="modal-verify">
+          <div class="modal-icon">🪪</div>
+          <h3>Identity Verification Required</h3>
+          <p>You need to verify your student identity before placing an order.</p>
+          <div class="modal-actions">
+            <a href="/verification/form" class="btn btn-primary">Verify Now</a>
+            <button onclick="closeModal()" class="btn btn-outline">Cancel</button>
+          </div>
+        </div>
+      `;
+      document.getElementById('verifModal').classList.remove('hidden');
+    } else if (data.action === 'pending') {
+      // Still pending
+      document.getElementById('modal-content').innerHTML = `
+        <div class="modal-verify">
+          <div class="modal-icon">⏳</div>
+          <h3>Account Under Review</h3>
+          <p>Your account is currently under review. Please wait for admin approval before placing orders.</p>
+          <div class="modal-actions">
+            <a href="/verification/status" class="btn btn-outline">Check Status</a>
+            <button onclick="closeModal()" class="btn btn-cancel">Cancel</button>
+          </div>
+        </div>
+      `;
+      document.getElementById('verifModal').classList.remove('hidden');
+    } else if (data.action === 'resubmit') {
+      // Rejected — allow resubmission
+      document.getElementById('modal-content').innerHTML = `
+        <div class="modal-verify">
+          <div class="modal-icon">❌</div>
+          <h3>Verification Rejected</h3>
+          <p>${data.message}</p>
+          <div class="modal-actions">
+            <a href="/verification/form" class="btn btn-primary">Resubmit Verification</a>
+            <button onclick="closeModal()" class="btn btn-outline">Cancel</button>
+          </div>
+        </div>
+      `;
+      document.getElementById('verifModal').classList.remove('hidden');
+    } else {
+      alert(data.message || 'Something went wrong.');
+    }
+  } catch (err) {
+    alert('Network error. Please try again.');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Place Order';
+});
+
+function closeModal() {
+  document.getElementById('verifModal').classList.add('hidden');
+}
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,48 @@
+<%- include('../partials/header') %>
+
+<section class="page-header">
+  <h1>👥 All Users</h1>
+</section>
+
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Full Name</th>
+        <th>Verification</th>
+        <th>Joined</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% users.forEach(user => { %>
+        <tr>
+          <td><strong><%= user.username %></strong></td>
+          <td><%= user.email %></td>
+          <td><span class="badge-role role-<%= user.role %>"><%= user.role %></span></td>
+          <td>
+            <% if (user.first_name) { %>
+              <%= user.first_name %> <%= user.last_name %>
+            <% } else { %>
+              <span class="text-muted">—</span>
+            <% } %>
+          </td>
+          <td>
+            <% if (user.verif_status) { %>
+              <span class="badge-status status-<%= user.verif_status %>"><%= user.verif_status %></span>
+            <% } else { %>
+              <span class="text-muted">Not submitted</span>
+            <% } %>
+          </td>
+          <td><%= new Date(user.created_at).toLocaleDateString() %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<a href="/admin/dashboard" class="btn btn-outline" style="margin-top:20px">← Dashboard</a>
+
+<%- include('../partials/footer') %>

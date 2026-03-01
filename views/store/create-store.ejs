@@ -1,0 +1,23 @@
+<%- include('../partials/header') %>
+
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">🏪</div>
+    <h2>Create Your Store</h2>
+    <p class="auth-sub">Set up your student store to start selling!</p>
+
+    <form action="/store/my-store/create" method="POST">
+      <div class="form-group">
+        <label>Store Name</label>
+        <input type="text" name="name" placeholder="Your store name" required>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" rows="3" placeholder="What do you sell?"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Create Store</button>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

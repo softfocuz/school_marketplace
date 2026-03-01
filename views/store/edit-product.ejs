@@ -1,0 +1,57 @@
+<%- include('../partials/header') %>
+
+<section class="page-header">
+  <h1>✏️ Edit Product</h1>
+  <a href="/store/my-store" class="btn btn-outline">← Back to Dashboard</a>
+</section>
+
+<div class="verif-form-wrap">
+  <form action="/store/my-store/product/edit/<%= product.id %>" method="POST"
+    enctype="multipart/form-data" class="verif-form">
+
+    <div class="form-group">
+      <label>Product Name</label>
+      <input type="text" name="name" value="<%= product.name %>" required>
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <input type="text" name="description" value="<%= product.description || '' %>">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Price (₱)</label>
+        <input type="number" name="price" step="0.01" value="<%= product.price %>" required>
+      </div>
+      <div class="form-group">
+        <label>Stock</label>
+        <input type="number" name="stock" value="<%= product.stock %>" min="0" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Product Photo <span style="color:#888; font-size:0.82rem;">(leave blank to keep current)</span></label>
+
+      <!-- Show current image if exists -->
+      <% if (product.image) { %>
+        <div style="margin-bottom:10px;">
+          <p style="font-size:0.85rem; color:#666; margin-bottom:6px;">Current photo:</p>
+          <img src="/uploads/<%= product.image %>" alt="Current"
+            style="width:160px; height:120px; object-fit:cover; border-radius:8px; border:2px solid #eee;">
+        </div>
+      <% } %>
+
+      <input type="file" name="product_image" accept="image/*">
+      <small class="form-hint">📎 JPG, PNG, WEBP — Max 5MB. Upload new to replace current photo.</small>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+      <a href="/store/my-store" class="btn btn-outline">Cancel</a>
+    </div>
+
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

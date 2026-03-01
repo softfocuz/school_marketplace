@@ -1,0 +1,50 @@
+<%- include('../partials/header') %>
+
+<section class="page-header">
+  <h1>Verification Status</h1>
+</section>
+
+<div class="status-wrap">
+  <% if (!verification) { %>
+    <div class="status-card status-none">
+      <div class="status-icon">📋</div>
+      <h3>No Verification Submitted</h3>
+      <p>You haven't submitted a verification yet.</p>
+      <a href="/verification/form" class="btn btn-primary">Verify Now</a>
+    </div>
+
+  <% } else if (verification.status === 'pending') { %>
+    <div class="status-card status-pending">
+      <div class="status-icon">⏳</div>
+      <h3>Under Review</h3>
+      <p>Your verification is being reviewed by our admin team. Please check back later.</p>
+      <p class="submitted-date">Submitted: <%= new Date(verification.submitted_at).toLocaleDateString() %></p>
+      <div class="pending-note">
+        <strong>While you wait:</strong> You can continue browsing stores and adding items to your cart. You'll be able to place orders once approved.
+      </div>
+    </div>
+
+  <% } else if (verification.status === 'approved') { %>
+    <div class="status-card status-approved">
+      <div class="status-icon">✅</div>
+      <h3>Verified!</h3>
+      <p>Your identity has been verified. You can now place orders in the marketplace.</p>
+      <a href="/stores" class="btn btn-primary">Start Shopping</a>
+    </div>
+
+  <% } else if (verification.status === 'rejected') { %>
+    <div class="status-card status-rejected">
+      <div class="status-icon">❌</div>
+      <h3>Verification Rejected</h3>
+      <% if (verification.admin_note) { %>
+        <div class="rejection-reason">
+          <strong>Reason:</strong> <%= verification.admin_note %>
+        </div>
+      <% } %>
+      <p>Please fix the issue and resubmit your verification.</p>
+      <a href="/verification/form" class="btn btn-primary">Resubmit Verification</a>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>
