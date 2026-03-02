@@ -1,11 +1,10 @@
-// routes/orders.js
 const express = require('express');
 const router = express.Router();
 const { get, all, run } = require('../config/database');
 const { requireLogin } = require('../middleware/auth');
 const { sendOrderNotification } = require('../config/email');
 
-// VIEW CART
+//VIEW CART
 router.get('/cart', requireLogin, async (req, res) => {
   const cartItems = await all(`
     SELECT ci.id as cart_item_id, ci.quantity,
@@ -19,7 +18,7 @@ router.get('/cart', requireLogin, async (req, res) => {
   res.render('store/cart', { cartItems, total });
 });
 
-// ADD TO CART
+//ADD TO CART
 router.post('/cart/add', requireLogin, async (req, res) => {
   const { product_id, quantity = 1 } = req.body;
   const product = await get('SELECT * FROM products WHERE id = ? AND available = 1', [product_id]);
@@ -36,17 +35,17 @@ router.post('/cart/add', requireLogin, async (req, res) => {
   res.json({ success: true, message: 'Added to cart!', cartCount: cartData.total || 0 });
 });
 
-// REMOVE FROM CART
+//REMOVE FROM CART
 router.post('/cart/remove', requireLogin, async (req, res) => {
   await run('DELETE FROM cart_items WHERE id = ? AND user_id = ?', [req.body.cart_item_id, req.session.userId]);
   res.redirect('/orders/cart');
 });
 
-// PLACE ORDER
+//PLACE ORDER
 router.post('/place', requireLogin, async (req, res) => {
   const userId = req.session.userId;
 
-  // Check verification
+  //Check verification
   const verification = await get('SELECT * FROM verifications WHERE user_id = ?', [userId]);
 
   if (!verification) {
@@ -59,7 +58,7 @@ router.post('/place', requireLogin, async (req, res) => {
     return res.json({ success: false, action: 'resubmit', message: `Your verification was rejected. Reason: ${verification.admin_note || 'No reason given'}. Please resubmit.` });
   }
 
-  // Get cart
+  //Get cart
   const cartItems = await all(`
     SELECT ci.quantity, p.id as product_id, p.name, p.price, p.store_id,
            s.name as store_name, s.email as store_email
@@ -72,7 +71,7 @@ router.post('/place', requireLogin, async (req, res) => {
     return res.json({ success: false, message: 'Your cart is empty.' });
   }
 
-  // Group by store
+  //Group by store
   const storeGroups = {};
   cartItems.forEach(item => {
     if (!storeGroups[item.store_id]) {
@@ -96,7 +95,7 @@ router.post('/place', requireLogin, async (req, res) => {
         [orderId, item.product_id, item.quantity, item.price]);
     }
 
-    // Send email if store has email
+    //Send email if store has email
     if (group.store_email) {
       const user = await get('SELECT username FROM users WHERE id = ?', [userId]);
       const verif = await get('SELECT first_name, last_name FROM verifications WHERE user_id = ?', [userId]);
@@ -110,12 +109,12 @@ router.post('/place', requireLogin, async (req, res) => {
     }
   }
 
-  // Clear cart
+  //Clear cart
   await run('DELETE FROM cart_items WHERE user_id = ?', [userId]);
   res.json({ success: true, message: 'Order placed successfully!', orderIds });
 });
 
-// MY ORDERS
+//MY ORDERS
 router.get('/my-orders', requireLogin, async (req, res) => {
   const orders = await all(`
     SELECT o.*, s.name as store_name
@@ -131,7 +130,7 @@ router.get('/my-orders', requireLogin, async (req, res) => {
   res.render('store/my-orders', { orders });
 });
 
-// CANCEL ORDER (pending only)
+//CANCEL ORDER (pending only)
 router.post('/cancel/:id', requireLogin, async (req, res) => {
   const order = await get('SELECT * FROM orders WHERE id = ? AND user_id = ?', [req.params.id, req.session.userId]);
   if (!order) { req.flash('error', 'Order not found.'); return res.redirect('/orders/my-orders'); }

@@ -1,4 +1,3 @@
-// routes/admin.js
 const express = require('express');
 const router = express.Router();
 const { get, all, run } = require('../config/database');
@@ -6,7 +5,7 @@ const { requireAdmin } = require('../middleware/auth');
 
 router.use(requireAdmin);
 
-// DASHBOARD
+//DASHBOARD
 router.get('/dashboard', async (req, res) => {
   const stats = {
     totalUsers: (await get("SELECT COUNT(*) as c FROM users WHERE role = 'buyer'")).c,
@@ -21,7 +20,7 @@ router.get('/dashboard', async (req, res) => {
   res.render('admin/dashboard', { stats, pendingVerifs });
 });
 
-// ALL VERIFICATIONS
+//ALL VERIFICATIONS
 router.get('/verifications', async (req, res) => {
   const filter = req.query.status || 'all';
   let sql = `SELECT v.*, u.username, u.email FROM verifications v JOIN users u ON v.user_id = u.id`;
@@ -32,7 +31,7 @@ router.get('/verifications', async (req, res) => {
   res.render('admin/verifications', { verifications, filter });
 });
 
-// VIEW ONE VERIFICATION
+//VIEW ONE VERIFICATION
 router.get('/verifications/:id', async (req, res) => {
   const verif = await get(`
     SELECT v.*, u.username, u.email FROM verifications v JOIN users u ON v.user_id = u.id WHERE v.id = ?`, [req.params.id]);
@@ -40,14 +39,14 @@ router.get('/verifications/:id', async (req, res) => {
   res.render('admin/verification-detail', { verif });
 });
 
-// APPROVE
+//APPROVE
 router.post('/verifications/:id/approve', async (req, res) => {
   await run(`UPDATE verifications SET status='approved', reviewed_at=CURRENT_TIMESTAMP, admin_note=NULL WHERE id=?`, [req.params.id]);
   req.flash('success', 'Verification approved!');
   res.redirect('/admin/verifications');
 });
 
-// REJECT
+//REJECT
 router.post('/verifications/:id/reject', async (req, res) => {
   await run(`UPDATE verifications SET status='rejected', reviewed_at=CURRENT_TIMESTAMP, admin_note=? WHERE id=?`,
     [req.body.admin_note || 'No reason given.', req.params.id]);
@@ -55,7 +54,7 @@ router.post('/verifications/:id/reject', async (req, res) => {
   res.redirect('/admin/verifications');
 });
 
-// ALL ORDERS
+//ALL ORDERS
 router.get('/orders', async (req, res) => {
   const orders = await all(`
     SELECT o.*, s.name as store_name, u.username as buyer_name, v.first_name, v.last_name
@@ -68,7 +67,7 @@ router.get('/orders', async (req, res) => {
   res.render('admin/orders', { orders });
 });
 
-// ALL USERS
+//ALL USERS
 router.get('/users', async (req, res) => {
   const users = await all(`
     SELECT u.*, v.status as verif_status, v.first_name, v.last_name

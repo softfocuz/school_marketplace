@@ -1,7 +1,6 @@
 <%- include('../partials/header') %>
 
 <div class="store-header">
-  <div class="store-header-icon"><%= store.is_fastfood ? '🍔' : '🛍️' %></div>
   <div>
     <h1><%= store.name %></h1>
     <p><%= store.description || '' %></p>
@@ -32,7 +31,7 @@
             </div>
           <% } else { %>
             <div class="product-img-placeholder">
-              <%= store.is_fastfood ? '🍟' : '📦' %>
+              <%= store.is_fastfood ? 'food' : 'ttrep prod' %>
             </div>
           <% } %>
 
@@ -42,7 +41,7 @@
 
             <!-- Stock indicator for buyers -->
             <span class="stock-badge <%= product.stock === 0 ? 'out-of-stock' : product.stock <= 5 ? 'low-stock' : 'in-stock' %>">
-              <%= product.stock === 0 ? '❌ Out of stock' : product.stock <= 5 ? `⚠️ Only ${product.stock} left!` : `✅ ${product.stock} available` %>
+              <%= product.stock === 0 ? 'Out of stock' : product.stock <= 5 ? `Only ${product.stock} left!` : `${product.stock} available` %>
             </span>
 
             <div class="product-footer" style="margin-top:10px;">

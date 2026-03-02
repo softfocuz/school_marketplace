@@ -1,7 +1,7 @@
 <%- include('../partials/header') %>
 
 <section class="page-header">
-  <h1>🛒 Your Cart</h1>
+  <h1>Your Cart</h1>
 </section>
 
 <% if (cartItems.length === 0) { %>
@@ -60,10 +60,9 @@ document.getElementById('placeOrderBtn')?.addEventListener('click', async () => 
     const data = await res.json();
 
     if (data.success) {
-      // Order placed!
+      //Order placed!
       document.getElementById('modal-content').innerHTML = `
         <div class="modal-success">
-          <div class="modal-icon">✅</div>
           <h3>Order Placed!</h3>
           <p>Your order has been placed successfully. The store has been notified.</p>
           <a href="/orders/my-orders" class="btn btn-primary">View My Orders</a>
@@ -71,7 +70,7 @@ document.getElementById('placeOrderBtn')?.addEventListener('click', async () => 
       `;
       document.getElementById('verifModal').classList.remove('hidden');
     } else if (data.action === 'verify') {
-      // Never verified — show verification form prompt
+      //Never verified — show verification form prompt
       document.getElementById('modal-content').innerHTML = `
         <div class="modal-verify">
           <div class="modal-icon">🪪</div>
@@ -85,7 +84,7 @@ document.getElementById('placeOrderBtn')?.addEventListener('click', async () => 
       `;
       document.getElementById('verifModal').classList.remove('hidden');
     } else if (data.action === 'pending') {
-      // Still pending
+      //Still pending
       document.getElementById('modal-content').innerHTML = `
         <div class="modal-verify">
           <div class="modal-icon">⏳</div>
@@ -99,10 +98,9 @@ document.getElementById('placeOrderBtn')?.addEventListener('click', async () => 
       `;
       document.getElementById('verifModal').classList.remove('hidden');
     } else if (data.action === 'resubmit') {
-      // Rejected — allow resubmission
+      //Rejected - allow resubmission
       document.getElementById('modal-content').innerHTML = `
         <div class="modal-verify">
-          <div class="modal-icon">❌</div>
           <h3>Verification Rejected</h3>
           <p>${data.message}</p>
           <div class="modal-actions">

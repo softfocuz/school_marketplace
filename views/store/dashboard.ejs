@@ -1,28 +1,25 @@
 <%- include('../partials/header') %>
 
 <section class="page-header">
-  <h1>🏪 <%= store.name %> — Dashboard</h1>
+  <h1><%= store.name %> — Dashboard</h1>
 </section>
 
 <!-- STORE STATS -->
 <div class="stats-grid">
   <div class="stat-card">
-    <span class="stat-icon">📦</span>
     <div><h3><%= products.length %></h3><p>Products</p></div>
   </div>
   <div class="stat-card">
-    <span class="stat-icon">🛒</span>
     <div><h3><%= orders.length %></h3><p>Orders</p></div>
   </div>
   <div class="stat-card">
-    <span class="stat-icon">💰</span>
     <div><h3>₱<%= parseFloat(totalRevenue).toFixed(2) %></h3><p>Revenue</p></div>
   </div>
 </div>
 
 <!-- ADD PRODUCT FORM -->
 <section>
-  <h2 class="section-title">➕ Add New Product</h2>
+  <h2 class="section-title">Add New Product</h2>
   <form action="/store/my-store/product/add" method="POST" enctype="multipart/form-data" class="add-product-form">
     <div class="form-row">
       <div class="form-group">
@@ -46,7 +43,7 @@
       <div class="form-group">
         <label>Product Photo <span style="color:#888; font-size:0.82rem;">(optional)</span></label>
         <input type="file" name="product_image" accept="image/*">
-        <small class="form-hint">📎 JPG, PNG, WEBP — Max 5MB</small>
+        <small class="form-hint">JPG, PNG, WEBP — Max 5MB</small>
       </div>
     </div>
     <button type="submit" class="btn btn-primary">Add Product</button>
@@ -55,7 +52,7 @@
 
 <!-- MY PRODUCTS -->
 <section>
-  <h2 class="section-title">📦 My Products</h2>
+  <h2 class="section-title">My Products</h2>
   <% if (products.length === 0) { %>
     <p class="empty-msg">No products yet. Add some above!</p>
   <% } else { %>
@@ -69,7 +66,7 @@
               <img src="/uploads/<%= p.image %>" alt="<%= p.name %>">
             </div>
           <% } else { %>
-            <div class="product-img-placeholder">📦</div>
+            <div class="product-img-placeholder">none</div>
           <% } %>
 
           <div class="product-body">
@@ -78,20 +75,20 @@
 
             <div class="product-footer">
               <span class="price">₱<%= parseFloat(p.price).toFixed(2) %></span>
-              <!-- Stock badge — turns red when low -->
+              <!-- Stock badge - turns red when low -->
               <span class="stock-badge <%= p.stock === 0 ? 'out-of-stock' : p.stock <= 5 ? 'low-stock' : 'in-stock' %>">
-                <%= p.stock === 0 ? '❌ Out of stock' : `📦 ${p.stock} left` %>
+                <%= p.stock === 0 ? 'Out of stock' : `${p.stock} left` %>
               </span>
             </div>
 
             <!-- Edit and Remove buttons -->
             <div style="display:flex; gap:8px; margin-top:10px;">
               <a href="/store/my-store/product/edit/<%= p.id %>" class="btn btn-sm btn-outline" style="flex:1; text-align:center;">
-                ✏️ Edit
+                Edit
               </a>
               <form action="/store/my-store/product/delete/<%= p.id %>" method="POST"
                 onsubmit="return confirm('Remove this product?')" style="flex:1;">
-                <button type="submit" class="btn btn-sm btn-danger" style="width:100%;">🗑️ Remove</button>
+                <button type="submit" class="btn btn-sm btn-danger" style="width:100%;">Remove</button>
               </form>
             </div>
           </div>
@@ -104,7 +101,7 @@
 
 <!-- INCOMING ORDERS -->
 <section>
-  <h2 class="section-title">🛒 Incoming Orders</h2>
+  <h2 class="section-title">Incoming Orders</h2>
   <% if (orders.length === 0) { %>
     <p class="empty-msg">No orders yet.</p>
   <% } else { %>
@@ -114,7 +111,7 @@
           <div>
             <span class="order-id">Order #<%= order.id %></span>
             <span class="order-store">
-              👤 <%= order.first_name ? order.first_name + ' ' + order.last_name : order.buyer_name %>
+              <%= order.first_name ? order.first_name + ' ' + order.last_name : order.buyer_name %>
             </span>
           </div>
           <span class="order-status status-<%= order.status %>"><%= order.status.toUpperCase() %></span>
@@ -136,14 +133,14 @@
           <% if (order.status === 'pending') { %>
             <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px;">
               <form action="/store/my-store/order/confirm/<%= order.id %>" method="POST">
-                <button type="submit" class="btn btn-sm btn-success">✅ Confirm</button>
+                <button type="submit" class="btn btn-sm btn-success">Confirm</button>
               </form>
               <form action="/store/my-store/order/reject/<%= order.id %>" method="POST"
                 onsubmit="return confirm('Reject this order?')"
                 style="display:flex; gap:6px; align-items:center;">
                 <input type="text" name="reject_reason" placeholder="Reason (optional)"
                   style="padding:5px 10px; border:2px solid #ddd; border-radius:6px; font-size:0.83rem; width:160px;">
-                <button type="submit" class="btn btn-sm btn-danger">❌ Reject</button>
+                <button type="submit" class="btn btn-sm btn-danger">Reject</button>
               </form>
             </div>
           <% } %>

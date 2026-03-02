@@ -1,4 +1,3 @@
-// routes/verification.js
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
@@ -6,7 +5,7 @@ const path = require('path');
 const { get, run } = require('../config/database');
 const { requireLogin } = require('../middleware/auth');
 
-// File upload setup
+//File upload setup
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'public/uploads/'),
   filename: (req, file, cb) => {
@@ -25,17 +24,17 @@ const upload = multer({
   }
 });
 
-// SHOW FORM
+//SHOW FORM
 router.get('/form', requireLogin, async (req, res) => {
   const verification = await get('SELECT * FROM verifications WHERE user_id = ?', [req.session.userId]);
   res.render('verification/form', { verification });
 });
 
-// SUBMIT
+//SUBMIT
 router.post('/submit', requireLogin, upload.single('student_id_photo'), async (req, res) => {
   const { first_name, last_name, course, year_level, schedule, contact_number, facebook_link, facebook_describe } = req.body;
 
-  // Validate Philippine mobile number
+  //Validate Philippine mobile number
   const phoneRegex = /^(09|\+639)\d{9}$/;
   if (!phoneRegex.test(contact_number)) {
     req.flash('error', 'Please enter a valid Philippine mobile number (e.g. 09XXXXXXXXX).');
@@ -61,7 +60,7 @@ router.post('/submit', requireLogin, upload.single('student_id_photo'), async (r
   const photo = req.file.filename;
 
   if (existing) {
-    // Resubmit after rejection
+    //Resubmit after rejection
     await run(`UPDATE verifications SET first_name=?, last_name=?, course=?, year_level=?, schedule=?,
       contact_number=?, facebook_link=?, facebook_describe=?, student_id_photo=?,
       status='pending', admin_note=NULL, submitted_at=CURRENT_TIMESTAMP WHERE user_id=?`,
@@ -76,7 +75,7 @@ router.post('/submit', requireLogin, upload.single('student_id_photo'), async (r
   res.redirect('/verification/status');
 });
 
-// STATUS PAGE
+//STATUS PAGE
 router.get('/status', requireLogin, async (req, res) => {
   const verification = await get('SELECT * FROM verifications WHERE user_id = ?', [req.session.userId]);
   res.render('verification/status', { verification });

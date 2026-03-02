@@ -7,35 +7,30 @@
 <!-- STATS ROW -->
 <div class="stats-grid">
   <div class="stat-card">
-    <span class="stat-icon">👥</span>
     <div>
       <h3><%= stats.totalUsers %></h3>
       <p>Buyers</p>
     </div>
   </div>
   <div class="stat-card">
-    <span class="stat-icon">🏪</span>
     <div>
       <h3><%= stats.totalStores %></h3>
       <p>Stores</p>
     </div>
   </div>
   <div class="stat-card">
-    <span class="stat-icon">None</span>
     <div>
       <h3><%= stats.totalOrders %></h3>
       <p>Total Orders</p>
     </div>
   </div>
   <div class="stat-card">
-    <span class="stat-icon">💰</span>
     <div>
       <h3>₱<%= parseFloat(stats.totalRevenue).toFixed(2) %></h3>
       <p>Revenue</p>
     </div>
   </div>
   <div class="stat-card stat-alert">
-    <span class="stat-icon">⏳</span>
     <div>
       <h3><%= stats.pendingVerifications %></h3>
       <p>Pending Verifications</p>
@@ -52,7 +47,7 @@
 
 <!-- PENDING VERIFICATIONS -->
 <section>
-  <h2 class="section-title">⏳ Pending Verifications</h2>
+  <h2 class="section-title">Pending Verifications</h2>
 
   <% if (pendingVerifs.length === 0) { %>
     <p class="empty-msg">No pending verifications. All caught up!</p>

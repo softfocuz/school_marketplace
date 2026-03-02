@@ -1,17 +1,16 @@
 <%- include('../partials/header') %>
 
 <section class="page-header">
-  <h1>🏪 School Marketplace</h1>
+  <h1>School Marketplace</h1>
   <p>Browse stores and discover amazing products from your fellow students!</p>
 </section>
 
 <!-- FASTFOOD SECTION -->
 <section class="store-section">
-  <h2 class="section-title">🍔 Fast Food Chains</h2>
+  <h2 class="section-title">Fast Food Chains</h2>
   <div class="stores-grid">
     <% stores.filter(s => s.is_fastfood).forEach(store => { %>
       <a href="/stores/<%= store.id %>" class="store-card fastfood-card">
-        <div class="store-icon">🍟</div>
         <div class="store-info">
           <h3><%= store.name %></h3>
           <p><%= store.description || 'Available school meals' %></p>
@@ -25,7 +24,7 @@
 
 <!-- STUDENT STORES SECTION -->
 <section class="store-section">
-  <h2 class="section-title">🎓 Student Stores</h2>
+  <h2 class="section-title">Student Stores</h2>
   <div class="stores-grid">
     <% const studentStores = stores.filter(s => !s.is_fastfood); %>
     <% if (studentStores.length === 0) { %>
@@ -33,7 +32,6 @@
     <% } else { %>
       <% studentStores.forEach(store => { %>
         <a href="/stores/<%= store.id %>" class="store-card">
-          <div class="store-icon">🛍️</div>
           <div class="store-info">
             <h3><%= store.name %></h3>
             <p><%= store.description || 'Student-run store' %></p>

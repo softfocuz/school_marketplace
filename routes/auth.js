@@ -1,10 +1,9 @@
-// routes/auth.js
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const { get, run } = require('../config/database');
 
-// REGISTER
+//REGISTER
 router.get('/register', (req, res) => res.render('auth/register'));
 
 router.post('/register', async (req, res) => {
@@ -25,7 +24,7 @@ router.post('/register', async (req, res) => {
   res.redirect('/auth/login');
 });
 
-// LOGIN
+//LOGIN
 router.get('/login', (req, res) => res.render('auth/login'));
 
 router.post('/login', async (req, res) => {
@@ -44,7 +43,7 @@ router.post('/login', async (req, res) => {
   res.redirect('/');
 });
 
-// LOGOUT
+//LOGOUT
 router.get('/logout', (req, res) => {
   req.session.destroy();
   res.redirect('/auth/login');
