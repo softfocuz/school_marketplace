@@ -66,7 +66,7 @@
               <img src="/uploads/<%= p.image %>" alt="<%= p.name %>">
             </div>
           <% } else { %>
-            <div class="product-img-placeholder">none</div>
+            <div class="product-img-placeholder">None</div>
           <% } %>
 
           <div class="product-body">
@@ -75,7 +75,7 @@
 
             <div class="product-footer">
               <span class="price">₱<%= parseFloat(p.price).toFixed(2) %></span>
-              <!-- Stock badge - turns red when low -->
+              <!-- Stock badge — turns red when low -->
               <span class="stock-badge <%= p.stock === 0 ? 'out-of-stock' : p.stock <= 5 ? 'low-stock' : 'in-stock' %>">
                 <%= p.stock === 0 ? 'Out of stock' : `${p.stock} left` %>
               </span>
@@ -113,9 +113,18 @@
             <span class="order-store">
               <%= order.first_name ? order.first_name + ' ' + order.last_name : order.buyer_name %>
             </span>
+            <% if (order.address) { %>
+              <span class="order-store"><%= order.address %></span>
+            <% } %>
           </div>
           <span class="order-status status-<%= order.status %>"><%= order.status.toUpperCase() %></span>
         </div>
+
+        <% if (order.notes) { %>
+          <div style="background:#f0f7ff; border-radius:6px; padding:8px 12px; margin-bottom:10px; font-size:0.88rem; color:#1e40af;">
+            <%= order.notes %>
+          </div>
+        <% } %>
 
         <div class="order-items">
           <% order.items.forEach(item => { %>

@@ -1,10 +1,8 @@
-// config/email.js
-// Nodemailer setup for sending order notifications
+//Nodemailer setup for sending order notifications
 
 const nodemailer = require('nodemailer');
 
-// Configure your email transporter here
-// For Gmail, enable "Less secure apps" or use an App Password
+//Configure email transporter here
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -28,10 +26,10 @@ async function sendOrderNotification(options) {
   const mailOptions = {
     from: `"NovaTech Ventures" <${process.env.EMAIL_USER || 'tanclarise46@gmail.com'}>`,
     to: to,
-    subject: `🛒 New Order #${orderId} for ${storeName}!`,
+    subject: `New Order #${orderId} for ${storeName}!`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f9f9f9; padding: 30px; border-radius: 10px;">
-        <h2 style="color: #e74c3c;">🛒 New Order Received!</h2>
+        <h2 style="color: #e74c3c;"> New Order Received!</h2>
         <p style="color: #555;">Hi <strong>${storeName}</strong>, you have a new order!</p>
         
         <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
@@ -54,10 +52,10 @@ async function sendOrderNotification(options) {
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log('📧 Order email sent:', info.messageId);
+    console.log('Order email sent:', info.messageId);
     return { success: true };
   } catch (err) {
-    console.error('❌ Email send failed:', err.message);
+    console.error('Email send failed:', err.message);
     return { success: false, error: err.message };
   }
 }

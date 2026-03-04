@@ -1,0 +1,79 @@
+<%- include('../partials/header') %>
+
+<section class="page-header">
+  <h1>Seller Accounts</h1>
+  <p>Approve or reject seller registrations.</p>
+</section>
+
+<div class="admin-nav">
+  <a href="/admin/dashboard" class="admin-nav-btn">Dashboard</a>
+  <a href="/admin/sellers" class="admin-nav-btn">Sellers</a>
+  <a href="/admin/verifications" class="admin-nav-btn">Verifications</a>
+  <a href="/admin/orders" class="admin-nav-btn">Orders</a>
+  <a href="/admin/users" class="admin-nav-btn">Users</a>
+</div>
+
+<div class="filter-tabs">
+  <a href="?status=all" class="tab <%= filter === 'all' ? 'active' : '' %>">All</a>
+  <a href="?status=pending" class="tab <%= filter === 'pending' ? 'active' : '' %>">Pending</a>
+  <a href="?status=approved" class="tab <%= filter === 'approved' ? 'active' : '' %>">Approved</a>
+  <a href="?status=rejected" class="tab <%= filter === 'rejected' ? 'active' : '' %>">Rejected</a>
+</div>
+
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Store</th>
+        <th>Registered</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (sellers.length === 0) { %>
+        <tr><td colspan="6" class="empty-cell">No sellers found.</td></tr>
+      <% } else { %>
+        <% sellers.forEach(seller => { %>
+          <tr>
+            <td><strong><%= seller.username %></strong></td>
+            <td><%= seller.email %></td>
+            <td><%= seller.store ? seller.store.name : 'No store yet' %></td>
+            <td><%= new Date(seller.created_at).toLocaleDateString() %></td>
+            <td>
+              <span class="badge-status status-<%= seller.seller_status %>">
+                <%= seller.seller_status ? seller.seller_status.toUpperCase() : 'PENDING' %>
+              </span>
+            </td>
+            <td>
+              <% if (seller.seller_status === 'pending') { %>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                  <form action="/admin/sellers/<%= seller.id %>/approve" method="POST">
+                    <button class="btn btn-sm btn-success">Approve</button>
+                  </form>
+                  <form action="/admin/sellers/<%= seller.id %>/reject" method="POST"
+                    onsubmit="return confirm('Reject this seller?')">
+                    <button class="btn btn-sm btn-danger">Reject</button>
+                  </form>
+                </div>
+              <% } else if (seller.seller_status === 'approved') { %>
+                <form action="/admin/sellers/<%= seller.id %>/reject" method="POST"
+                  onsubmit="return confirm('Revoke this seller?')">
+                  <button class="btn btn-sm btn-danger">Revoke</button>
+                </form>
+              <% } else { %>
+                <form action="/admin/sellers/<%= seller.id %>/approve" method="POST">
+                  <button class="btn btn-sm btn-success">Re-approve</button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../partials/footer') %>

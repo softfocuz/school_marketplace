@@ -1,7 +1,7 @@
 <%- include('../partials/header') %>
 
 <section class="page-header">
-  <h1>My Orders</h1>
+  <h1>📋 My Orders</h1>
 </section>
 
 <% if (orders.length === 0) { %>
@@ -15,13 +15,19 @@
         <div class="order-header">
           <div>
             <span class="order-id">Order #<%= order.id %></span>
-            <span class="order-store"><%= order.store_name %></span>
+            <span class="order-store">🏪 <%= order.store_name %></span>
           </div>
           <div class="order-meta">
             <span class="order-status status-<%= order.status %>"><%= order.status.toUpperCase() %></span>
             <span class="order-date"><%= new Date(order.created_at).toLocaleDateString() %></span>
           </div>
         </div>
+
+        <% if (order.notes) { %>
+          <div style="background:#f0f7ff; border-radius:6px; padding:8px 12px; margin-bottom:10px; font-size:0.88rem; color:#1e40af;">
+            <%= order.notes %>
+          </div>
+        <% } %>
 
         <div class="order-items">
           <% order.items.forEach(item => { %>
@@ -44,7 +50,7 @@
           <% } %>
           <%# Show rejection reason if order was rejected by seller %>
           <% if (order.status === 'rejected' && order.notes) { %>
-            <span style="color:#ef476f; font-size:0.85rem;">Reason: <%= order.notes %></span>
+            <span style="color:#ef476f; font-size:0.85rem;">❌ Reason: <%= order.notes %></span>
           <% } %>
           <%# Once confirmed, order cannot be cancelled — no button shown %>
         </div>

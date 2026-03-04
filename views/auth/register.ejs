@@ -2,6 +2,7 @@
 
 <div class="auth-page">
   <div class="auth-card">
+    <div class="auth-logo">🛍️</div>
     <h2>Create Account</h2>
     <p class="auth-sub">Join NovaTech Ventures</p>
 
@@ -20,16 +21,24 @@
       </div>
       <div class="form-group">
         <label>Register as</label>
-        <select name="role">
+        <select name="role" onchange="toggleSellerNote(this)">
           <option value="buyer">Buyer (Student)</option>
           <option value="seller">Seller (Store Owner)</option>
         </select>
       </div>
+      <div id="seller-note" class="info-box info-note" style="display:none; margin-bottom:16px;">
+        <strong>Seller accounts require admin approval.</strong>
+        After registering, an admin will review your account before you can log in.
+      </div>
       <button type="submit" class="btn btn-primary btn-full">Create Account</button>
     </form>
-
     <p class="auth-switch">Already have an account? <a href="/auth/login">Login here</a></p>
   </div>
 </div>
 
+<script>
+function toggleSellerNote(sel) {
+  document.getElementById('seller-note').style.display = sel.value === 'seller' ? 'block' : 'none';
+}
+</script>
 <%- include('../partials/footer') %>

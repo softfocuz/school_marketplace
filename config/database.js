@@ -1,6 +1,4 @@
 // config/database.js
-// SQLite database setup using sqlite3 (works on Windows without Visual Studio)
-
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const bcrypt = require('bcryptjs');
@@ -8,7 +6,6 @@ const bcrypt = require('bcryptjs');
 const DB_PATH = path.join(__dirname, '../database.sqlite');
 const db = new sqlite3.Database(DB_PATH);
 
-// Helper: run a query that doesn't return rows (CREATE, INSERT, UPDATE, DELETE)
 function run(sql, params = []) {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function (err) {
@@ -18,7 +15,6 @@ function run(sql, params = []) {
   });
 }
 
-// Helper: get one row
 function get(sql, params = []) {
   return new Promise((resolve, reject) => {
     db.get(sql, params, (err, row) => {
@@ -28,7 +24,6 @@ function get(sql, params = []) {
   });
 }
 
-// Helper: get multiple rows
 function all(sql, params = []) {
   return new Promise((resolve, reject) => {
     db.all(sql, params, (err, rows) => {
@@ -38,19 +33,22 @@ function all(sql, params = []) {
   });
 }
 
-// ─── CREATE TABLES & SEED DATA ────────────────────────────────────────────────
-
 async function initDatabase() {
   await run('PRAGMA foreign_keys = ON');
 
+  // Users — added seller_status for admin approval of sellers
   await run(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
     role TEXT DEFAULT 'buyer',
+    seller_status TEXT DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
+
+  // Add seller_status column if it doesn't exist yet (for existing databases)
+  await run(`ALTER TABLE users ADD COLUMN seller_status TEXT DEFAULT NULL`).catch(() => {});
 
   await run(`CREATE TABLE IF NOT EXISTS verifications (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -61,6 +59,7 @@ async function initDatabase() {
     year_level TEXT NOT NULL,
     schedule TEXT NOT NULL,
     contact_number TEXT NOT NULL,
+    address TEXT NOT NULL,
     facebook_link TEXT NOT NULL,
     facebook_describe TEXT NOT NULL,
     student_id_photo TEXT NOT NULL,
@@ -71,6 +70,9 @@ async function initDatabase() {
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
 
+  // Add address column if it doesn't exist yet (for existing databases)
+  await run(`ALTER TABLE verifications ADD COLUMN address TEXT`).catch(() => {});
+
   await run(`CREATE TABLE IF NOT EXISTS stores (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     seller_id INTEGER NOT NULL,
@@ -78,7 +80,6 @@ async function initDatabase() {
     description TEXT,
     logo TEXT,
     email TEXT,
-    is_fastfood INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (seller_id) REFERENCES users(id)
   )`);
@@ -139,12 +140,12 @@ async function initDatabase() {
     console.log('✅ Admin created: admin / admin123');
   }
 
-  // Seed Clarise
+  // Seed Clarise (approved seller)
   const clarise = await get('SELECT id FROM users WHERE username = ?', ['clarise']);
   if (!clarise) {
     const hash = bcrypt.hashSync('clarise123', 10);
-    const seller = await run('INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
-      ['clarise', 'tanclarise46@gmail.com', hash, 'seller']);
+    const seller = await run('INSERT INTO users (username, email, password, role, seller_status) VALUES (?, ?, ?, ?, ?)',
+      ['clarise', 'tanclarise46@gmail.com', hash, 'seller', 'approved']);
     const store = await run('INSERT INTO stores (seller_id, name, description, email) VALUES (?, ?, ?, ?)',
       [seller.lastID, 'Clarise', 'Fresh homemade goodies and student favorites!', 'tanclarise46@gmail.com']);
     await run('INSERT INTO products (store_id, name, description, price, stock) VALUES (?, ?, ?, ?, ?)',
@@ -154,40 +155,6 @@ async function initDatabase() {
     await run('INSERT INTO products (store_id, name, description, price, stock) VALUES (?, ?, ?, ?, ?)',
       [store.lastID, 'Iced Milk Tea (500ml)', 'Classic milk tea with pearls.', 45, 50]);
     console.log('✅ Clarise store + 3 products created');
-  }
-
-  // Seed Jollibee
-  const jollibee = await get('SELECT id FROM users WHERE username = ?', ['jollibee_store']);
-  if (!jollibee) {
-    const hash = bcrypt.hashSync('jollibee123', 10);
-    const seller = await run('INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
-      ['jollibee_store', 'jollibee@novatech.com', hash, 'seller']);
-    const store = await run('INSERT INTO stores (seller_id, name, description, is_fastfood) VALUES (?, ?, ?, ?)',
-      [seller.lastID, 'Jollibee', 'Your favorite Filipino fast food chain!', 1]);
-    await run('INSERT INTO products (store_id, name, description, price, stock) VALUES (?, ?, ?, ?, ?)',
-      [store.lastID, 'Chickenjoy (1pc)', 'Crispy and juicy fried chicken.', 99, 100]);
-    await run('INSERT INTO products (store_id, name, description, price, stock) VALUES (?, ?, ?, ?, ?)',
-      [store.lastID, 'Jolly Spaghetti', 'Sweet Filipino-style spaghetti.', 65, 100]);
-    await run('INSERT INTO products (store_id, name, description, price, stock) VALUES (?, ?, ?, ?, ?)',
-      [store.lastID, 'Burger Steak', 'Savory burger patty in mushroom gravy.', 75, 100]);
-    console.log("✅ Jollibee store created");
-  }
-
-  // Seed McDonald's
-  const mcdo = await get('SELECT id FROM users WHERE username = ?', ['mcdo_store']);
-  if (!mcdo) {
-    const hash = bcrypt.hashSync('mcdo123', 10);
-    const seller = await run('INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
-      ['mcdo_store', 'mcdo@novatech.com', hash, 'seller']);
-    const store = await run('INSERT INTO stores (seller_id, name, description, is_fastfood) VALUES (?, ?, ?, ?)',
-      [seller.lastID, "McDonald's", "I'm lovin' it! Available school meals.", 1]);
-    await run('INSERT INTO products (store_id, name, description, price, stock) VALUES (?, ?, ?, ?, ?)',
-      [store.lastID, 'McChicken Sandwich', 'Crispy chicken sandwich with mayo.', 89, 100]);
-    await run('INSERT INTO products (store_id, name, description, price, stock) VALUES (?, ?, ?, ?, ?)',
-      [store.lastID, 'Large Fries', 'Golden crispy French fries.', 69, 100]);
-    await run('INSERT INTO products (store_id, name, description, price, stock) VALUES (?, ?, ?, ?, ?)',
-      [store.lastID, "McFloat (Medium)", 'Softdrink with vanilla ice cream float.', 55, 100]);
-    console.log("✅ McDonald's store created");
   }
 }
 

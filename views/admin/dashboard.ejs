@@ -1,45 +1,58 @@
 <%- include('../partials/header') %>
 
 <section class="page-header">
-  <h1>Admin Dashboard</h1>
+  <h1>🔐 Admin Dashboard</h1>
 </section>
 
 <!-- STATS ROW -->
 <div class="stats-grid">
   <div class="stat-card">
+    <span class="stat-icon">👥</span>
     <div>
       <h3><%= stats.totalUsers %></h3>
       <p>Buyers</p>
     </div>
   </div>
   <div class="stat-card">
+    <span class="stat-icon">🏪</span>
     <div>
       <h3><%= stats.totalStores %></h3>
       <p>Stores</p>
     </div>
   </div>
   <div class="stat-card">
+    <span class="stat-icon">📦</span>
     <div>
       <h3><%= stats.totalOrders %></h3>
       <p>Total Orders</p>
     </div>
   </div>
   <div class="stat-card">
+    <span class="stat-icon">💰</span>
     <div>
       <h3>₱<%= parseFloat(stats.totalRevenue).toFixed(2) %></h3>
       <p>Revenue</p>
     </div>
   </div>
   <div class="stat-card stat-alert">
+    <span class="stat-icon">⏳</span>
     <div>
       <h3><%= stats.pendingVerifications %></h3>
       <p>Pending Verifications</p>
+    </div>
+  </div>
+  <div class="stat-card stat-alert">
+    <span class="stat-icon">🏪</span>
+    <div>
+      <h3><%= stats.pendingSellers %></h3>
+      <p>Pending Sellers</p>
     </div>
   </div>
 </div>
 
 <!-- ADMIN NAVIGATION -->
 <div class="admin-nav">
+  <a href="/admin/sellers" class="admin-nav-btn">🏪 Sellers</a>
   <a href="/admin/verifications" class="admin-nav-btn">🪪 Verifications</a>
   <a href="/admin/orders" class="admin-nav-btn">📦 All Orders</a>
   <a href="/admin/users" class="admin-nav-btn">👥 Users</a>
@@ -47,7 +60,7 @@
 
 <!-- PENDING VERIFICATIONS -->
 <section>
-  <h2 class="section-title">Pending Verifications</h2>
+  <h2 class="section-title">⏳ Pending Verifications</h2>
 
   <% if (pendingVerifs.length === 0) { %>
     <p class="empty-msg">No pending verifications. All caught up!</p>
@@ -80,6 +93,40 @@
         </tbody>
       </table>
     </div>
+  <% } %>
+</section>
+
+
+<section>
+  <h2 class="section-title">🏪 Pending Seller Accounts</h2>
+  <% if (pendingSellers.length === 0) { %>
+    <p class="empty-msg">No pending seller accounts.</p>
+  <% } else { %>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Username</th><th>Email</th><th>Registered</th><th>Action</th></tr></thead>
+        <tbody>
+          <% pendingSellers.forEach(seller => { %>
+            <tr>
+              <td><strong><%= seller.username %></strong></td>
+              <td><%= seller.email %></td>
+              <td><%= new Date(seller.created_at).toLocaleDateString() %></td>
+              <td>
+                <div style="display:flex; gap:8px;">
+                  <form action="/admin/sellers/<%= seller.id %>/approve" method="POST">
+                    <button class="btn btn-sm btn-success">Approve</button>
+                  </form>
+                  <form action="/admin/sellers/<%= seller.id %>/reject" method="POST">
+                    <button class="btn btn-sm btn-danger">Reject</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <a href="/admin/sellers" style="font-size:0.9rem; margin-top:10px; display:inline-block;">View all sellers →</a>
   <% } %>
 </section>
 
