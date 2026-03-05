@@ -79,7 +79,6 @@ async function initDatabase() {
     name TEXT NOT NULL,
     description TEXT,
     logo TEXT,
-    email TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (seller_id) REFERENCES users(id)
   )`);
@@ -146,8 +145,8 @@ async function initDatabase() {
     const hash = bcrypt.hashSync('clarise123', 10);
     const seller = await run('INSERT INTO users (username, email, password, role, seller_status) VALUES (?, ?, ?, ?, ?)',
       ['clarise', 'tanclarise46@gmail.com', hash, 'seller', 'approved']);
-    const store = await run('INSERT INTO stores (seller_id, name, description, email) VALUES (?, ?, ?, ?)',
-      [seller.lastID, 'Clarise', 'Fresh homemade goodies and student favorites!', 'tanclarise46@gmail.com']);
+    const store = await run('INSERT INTO stores (seller_id, name, description) VALUES (?, ?, ?)',
+      [seller.lastID, 'Clarise', 'Fresh homemade goodies and student favorites!']);
     await run('INSERT INTO products (store_id, name, description, price, stock) VALUES (?, ?, ?, ?, ?)',
       [store.lastID, 'Baked Macaroni', 'Homemade creamy baked macaroni, good for sharing!', 85, 20]);
     await run('INSERT INTO products (store_id, name, description, price, stock) VALUES (?, ?, ?, ?, ?)',

@@ -1,19 +1,18 @@
 <%- include('../partials/header') %>
 
 <section class="page-header">
-  <h1>🏪 School Marketplace</h1>
-  <p>Browse stores and discover amazing products from your fellow students!</p>
+  <h1>Shop Local. Support Entrepreneurs.</h1>
+  <p>Welcome to our marketplace! A friendly platform for student entrepreneurs and local business owners, where everyone can browse, buy, and sell unique products. Shop with confidence, support local businesses, and help ideas grow into opportunities for the community.</p>
 </section>
 
 <section class="store-section">
-  <h2 class="section-title">🎓 Student Stores</h2>
+  <h2 class="section-title">Student Stores</h2>
   <div class="stores-grid">
     <% if (stores.length === 0) { %>
       <p class="empty-msg">No stores available yet.</p>
     <% } else { %>
       <% stores.forEach(store => { %>
         <a href="/stores/<%= store.id %>" class="store-card">
-          <div class="store-icon">🛍️</div>
           <div class="store-info">
             <h3><%= store.name %></h3>
             <p><%= store.description || 'Student-run store' %></p>

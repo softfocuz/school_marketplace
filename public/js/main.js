@@ -1,5 +1,4 @@
-// public/js/main.js
-// Client-side utilities for NovaTech Ventures
+// Client-side utilities
 
 // Close modal when clicking backdrop
 document.addEventListener('click', function(e) {

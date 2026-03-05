@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jikart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="home-body">
+<nav class="navbar">
+  <a href="/" class="nav-brand">
+    <span><strong style="color:#FF7F50">Jikart</strong></span>
+  </a>
+  <div class="nav-links">
+    <a href="/stores">Browse Stores</a>
+    <% if (currentUser) { %>
+      <% if (currentUser.role === 'admin') { %>
+        <a href="/admin/dashboard">Admin</a>
+      <% } else if (currentUser.role === 'seller') { %>
+        <a href="/store/my-store">My Store</a>
+      <% } else { %>
+        <a href="/orders/my-orders">My Orders</a>
+      <% } %>
+      <a href="/orders/cart" class="cart-btn">
+        Cart <% if (cartCount > 0) { %><span class="cart-badge"><%= cartCount %></span><% } %>
+      </a>
+      <div class="nav-user">
+        <span><%= currentUser.username %></span>
+        <a href="/auth/logout" class="btn-logout">Logout</a>
+      </div>
+    <% } else { %>
+      <a href="/auth/login" class="btn-login">Login</a>
+      <a href="/auth/register" class="btn-register">Register</a>
+    <% } %>
+  </div>
+</nav>
+
+<div class="container">
+  <% if (flashSuccess && flashSuccess.length > 0) { %>
+    <div class="alert alert-success"><%= flashSuccess[0] %></div>
+  <% } %>
+  <% if (flashError && flashError.length > 0) { %>
+    <div class="alert alert-error"><%= flashError[0] %></div>
+  <% } %>
+</div>
+
+<main class="home-main">
+  <section class="hero">
+    <h1 id="hp-title">Jikart</h1>
+    <div class="hero-content">
+      <div class="hero-btns">
+        <% if (!currentUser) { %>
+          <a href="/auth/register" class="btn-hero-outline">Join Now</a>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-home">
+    <h2 class="section-home-title">How It Works</h2>
+    <p class="section-home-sub">Start buying or selling in just a few simple steps:</p>
+    <div class="steps-grid">
+      <div class="step-card">
+        <span class="step-num">1</span>
+        <h3>Create an Account</h3>
+        <p>Register as a buyer or seller. Sellers are reviewed before they can start selling</p>
+      </div>
+      <div class="step-card">
+        <span class="step-num">2</span>
+        <h3>Get Verified</h3>
+        <p>Complete a quick verification to place orders securely.</p>
+      </div>
+      <div class="step-card">
+        <span class="step-num">3</span>
+        <h3>Browse & Order</h3>
+        <p>Explore stores, add items to your cart, and enter your delivery details.</p>
+      </div>
+      <div class="step-card">
+        <span class="step-num">4</span>
+        <h3>Get It Delivered</h3>
+        <p>The seller confirms and delivers your items to your chosen location.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="features-bg">
+    <div class="features-inner">
+      <h1 style="margin-bottom: 25px; text-align:center;">Safe, Simple, and Community-Driven</h1>
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3>Verified Buyers Only</h3>
+          <p>All buyers go through a verification process so sellers know exactly who they’re dealing with.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Student-Run Stores</h3>
+          <p>Support your fellow students by buying from their stores right on campus.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Campus Delivery</h3>
+          <p>Enter your location and get your orders delivered directly to you within school.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Admin Controlled</h3>
+          <p>Admins verify buyers and approve sellers to keep the marketplace safe and trusted.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Track Your Orders</h3>
+          <p>See the status of every order — pending, confirmed, or rejected — in real time.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Seller Dashboard</h3>
+          <p>Sellers manage products, track revenue, and handle orders all in one place.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="contact">
+    <div class="container">
+      <h3>Contact Us</h3>
+      <p>
+        Have questions, concerns, or want to partner with us? We'd love to hear from you.
+        Reach out through any of the details below.
+      </p>
+
+      <div class="contact-details">
+        <div class="contact-item">
+          <h4>Email</h4>
+          <p>tanclarise46@gmail.com</p>
+        </div>
+
+        <div class="contact-item">
+          <h4>Phone</h4>
+          <p>+63 939 101 5822</p>
+        </div>
+
+        <div class="contact-item">
+          <h4>Business Hours</h4>
+          <p>Monday - Friday</p>
+          <p>7:00 AM - 4:00 PM</p>
+        </div>
+
+        <div class="contact-item">
+          <h4>Location</h4>
+          <p>Garcia College of Technology</p>
+        </div>
+
+        <div class="contact-item">
+          <h4>Follow Us</h4>
+          <p>Facebook: Clarise Tan</p>
+          <p>Instagram: reesezmry</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="footer">
+  <p>© 2026 Jikart</p>
+</footer>
+</body>
+</html>

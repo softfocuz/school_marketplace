@@ -56,7 +56,7 @@ app.use('/verification', require('./routes/verification'));
 app.use('/admin', require('./routes/admin'));
 
 // Home
-app.get('/', (req, res) => res.redirect('/stores'));
+app.get('/', (req, res) => res.render('index'));
 
 // Init DB then start server
 const { initDatabase } = require('./config/database');

@@ -3,7 +3,6 @@ const express = require('express');
 const router = express.Router();
 const { get, all, run } = require('../config/database');
 const { requireLogin } = require('../middleware/auth');
-const { sendOrderNotification } = require('../config/email');
 
 // VIEW CART
 router.get('/cart', requireLogin, async (req, res) => {
@@ -97,18 +96,7 @@ router.post('/place', requireLogin, async (req, res) => {
         [orderId, item.product_id, item.quantity, item.price]);
     }
 
-    // Send email if store has email
-    if (group.store_email) {
-      const user = await get('SELECT username FROM users WHERE id = ?', [userId]);
-      const verif = await get('SELECT first_name, last_name FROM verifications WHERE user_id = ?', [userId]);
-      const buyerName = verif ? `${verif.first_name} ${verif.last_name}` : user.username;
-      await sendOrderNotification({
-        to: group.store_email,
-        storeName: group.store_name,
-        orderItems: group.items.map(i => ({ name: i.name, quantity: i.quantity, price_at_order: i.price })),
-        buyerName, total, orderId
-      });
-    }
+
   }
 
   // Clear cart

@@ -1,7 +1,7 @@
 <%- include('../partials/header') %>
 
 <section class="page-header">
-  <h1>🪪 Review Verification</h1>
+  <h1>Review Verification</h1>
   <a href="/admin/verifications" class="btn btn-outline">← Back</a>
 </section>
 
@@ -18,7 +18,7 @@
   <!-- USER INFO -->
   <div class="detail-grid">
     <div class="detail-section">
-      <h3>👤 Personal Info</h3>
+      <h3>Personal Info</h3>
       <table class="detail-table">
         <tr><td>Username</td><td><strong><%= verif.username %></strong></td></tr>
         <tr><td>Email</td><td><%= verif.email %></td></tr>
@@ -32,13 +32,13 @@
     </div>
 
     <div class="detail-section">
-      <h3>📘 Facebook Info</h3>
+      <h3>Facebook Info</h3>
       <table class="detail-table">
         <tr><td>FB Link/Name</td><td><%= verif.facebook_link %></td></tr>
         <tr><td>Profile Description</td><td><%= verif.facebook_describe %></td></tr>
       </table>
 
-      <h3 style="margin-top:20px">🪪 Student ID Photo</h3>
+      <h3 style="margin-top:20px">Student ID Photo</h3>
       <% if (verif.student_id_photo) { %>
         <img src="/uploads/<%= verif.student_id_photo %>" alt="Student ID" class="id-photo">
       <% } else { %>
@@ -60,19 +60,19 @@
       <!-- APPROVE -->
       <form action="/admin/verifications/<%= verif.id %>/approve" method="POST"
         onsubmit="return confirm('Approve this verification?')">
-        <button type="submit" class="btn btn-success">✅ Approve</button>
+        <button type="submit" class="btn btn-success">Approve</button>
       </form>
 
       <!-- REJECT -->
       <form action="/admin/verifications/<%= verif.id %>/reject" method="POST"
         onsubmit="return document.getElementById('admin_note').value.trim() !== '' || (alert('Please enter a rejection reason.'), false)">
         <input type="text" name="admin_note" id="admin_note" placeholder="Reason for rejection..." class="reject-input">
-        <button type="submit" class="btn btn-danger">❌ Reject</button>
+        <button type="submit" class="btn btn-danger">Reject</button>
       </form>
     </div>
   <% } else { %>
     <div class="info-box info-success">
-      ✅ This verification has been approved.
+      This verification has been approved.
     </div>
   <% } %>
 

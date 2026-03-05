@@ -43,7 +43,7 @@ router.get('/my-store', requireLogin, requireSeller, async (req, res) => {
 
   const products = await all('SELECT * FROM products WHERE store_id = ?', [store.id]);
   const orders = await all(
-    "SELECT o.*, u.username as buyer_name, v.first_name, v.last_name, v.address " +
+    "SELECT o.*, u.username as buyer_name, v.first_name, v.last_name, v.contact_number, v.facebook_link, v.student_id_photo " +
     "FROM orders o JOIN users u ON o.user_id = u.id " +
     "LEFT JOIN verifications v ON v.user_id = o.user_id " +
     "WHERE o.store_id = ? ORDER BY o.created_at DESC LIMIT 20",

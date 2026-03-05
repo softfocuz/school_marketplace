@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NovaTech Ventures</title>
+  <title>Jikart</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
@@ -13,8 +13,7 @@
 <!-- NAVBAR -->
 <nav class="navbar">
   <a href="/stores" class="nav-brand">
-    <span class="brand-icon">logo</span>
-    <span>Nova<strong>Tech</strong></span>
+    <span><strong style="color:#FF7F50">Jikart</strong></span>
   </a>
 
   <div class="nav-links">
@@ -30,7 +29,7 @@
       <% } %>
 
       <a href="/orders/cart" class="cart-btn">
-        🛒 Cart <% if (cartCount > 0) { %><span class="cart-badge"><%= cartCount %></span><% } %>
+        Cart <% if (cartCount > 0) { %><span class="cart-badge"><%= cartCount %></span><% } %>
       </a>
 
       <div class="nav-user">
@@ -44,7 +43,6 @@
   </div>
 </nav>
 
-<!-- FLASH MESSAGES -->
 <div class="container">
   <% if (flashSuccess && flashSuccess.length > 0) { %>
     <div class="alert alert-success"><%= flashSuccess[0] %></div>
