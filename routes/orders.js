@@ -1,4 +1,3 @@
-// routes/orders.js
 const express = require('express');
 const router = express.Router();
 const { get, all, run } = require('../config/database');
@@ -48,7 +47,6 @@ router.post('/place', requireLogin, async (req, res) => {
 
   // Check verification
   const verification = await get('SELECT * FROM verifications WHERE user_id = ?', [userId]);
-
   if (!verification) {
     return res.json({ success: false, action: 'verify', message: 'You need to verify your identity before placing an order.' });
   }
@@ -61,8 +59,7 @@ router.post('/place', requireLogin, async (req, res) => {
 
   // Get cart
   const cartItems = await all(`
-    SELECT ci.quantity, p.id as product_id, p.name, p.price, p.store_id,
-           s.name as store_name, s.email as store_email
+    SELECT ci.quantity, p.id as product_id, p.name, p.price, p.store_id, s.name as store_name
     FROM cart_items ci
     JOIN products p ON ci.product_id = p.id
     JOIN stores s ON p.store_id = s.id
@@ -76,7 +73,7 @@ router.post('/place', requireLogin, async (req, res) => {
   const storeGroups = {};
   cartItems.forEach(item => {
     if (!storeGroups[item.store_id]) {
-      storeGroups[item.store_id] = { store_id: item.store_id, store_name: item.store_name, store_email: item.store_email, items: [] };
+      storeGroups[item.store_id] = { store_id: item.store_id, store_name: item.store_name, items: [] };
     }
     storeGroups[item.store_id].items.push(item);
   });
@@ -87,16 +84,19 @@ router.post('/place', requireLogin, async (req, res) => {
     const group = storeGroups[storeId];
     const total = group.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
 
-    const order = await run('INSERT INTO orders (user_id, store_id, total_amount, notes) VALUES (?, ?, ?, ?)', [userId, group.store_id, total, delivery_address ? '📍 Deliver to: ' + delivery_address : '']);
+    const order = await run(
+      'INSERT INTO orders (user_id, store_id, total_amount, notes) VALUES (?, ?, ?, ?)',
+      [userId, group.store_id, total, delivery_address ? 'Deliver to: ' + delivery_address : '']
+    );
     const orderId = order.lastID;
     orderIds.push(orderId);
 
     for (const item of group.items) {
-      await run('INSERT INTO order_items (order_id, product_id, quantity, price_at_order) VALUES (?, ?, ?, ?)',
-        [orderId, item.product_id, item.quantity, item.price]);
+      await run(
+        'INSERT INTO order_items (order_id, product_id, quantity, price_at_order) VALUES (?, ?, ?, ?)',
+        [orderId, item.product_id, item.quantity, item.price]
+      );
     }
-
-
   }
 
   // Clear cart

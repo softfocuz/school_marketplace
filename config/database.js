@@ -53,16 +53,20 @@ async function initDatabase() {
   await run(`CREATE TABLE IF NOT EXISTS verifications (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL UNIQUE,
+    buyer_type TEXT DEFAULT 'student',
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
-    course TEXT NOT NULL,
-    year_level TEXT NOT NULL,
-    schedule TEXT NOT NULL,
     contact_number TEXT NOT NULL,
-    address TEXT NOT NULL,
     facebook_link TEXT NOT NULL,
     facebook_describe TEXT NOT NULL,
-    student_id_photo TEXT NOT NULL,
+    delivery_time TEXT,
+    preferred_date TEXT,
+    course TEXT,
+    year_level TEXT,
+    schedule TEXT,
+    student_id_photo TEXT,
+    occupation TEXT,
+    workplace TEXT,
     status TEXT DEFAULT 'pending',
     admin_note TEXT,
     submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -70,8 +74,17 @@ async function initDatabase() {
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
 
-  // Add address column if it doesn't exist yet (for existing databases)
-  await run(`ALTER TABLE verifications ADD COLUMN address TEXT`).catch(() => {});
+  // Add new columns for existing databases
+  await run("ALTER TABLE verifications ADD COLUMN buyer_type TEXT DEFAULT 'student'").catch(() => {});
+  await run("ALTER TABLE verifications ADD COLUMN delivery_time TEXT").catch(() => {});
+  await run("ALTER TABLE verifications ADD COLUMN preferred_date TEXT").catch(() => {});
+  await run("ALTER TABLE verifications ADD COLUMN occupation TEXT").catch(() => {});
+  await run("ALTER TABLE verifications ADD COLUMN workplace TEXT").catch(() => {});
+  await run("ALTER TABLE verifications ADD COLUMN buyer_rejection_note TEXT").catch(() => {});
+  await run("ALTER TABLE verifications ADD COLUMN school TEXT").catch(() => {});
+  await run("ALTER TABLE verifications ADD COLUMN student_level TEXT").catch(() => {});
+  await run("ALTER TABLE verifications ADD COLUMN home_address TEXT").catch(() => {});
+  await run("ALTER TABLE verifications ADD COLUMN default_address TEXT").catch(() => {});
 
   await run(`CREATE TABLE IF NOT EXISTS stores (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

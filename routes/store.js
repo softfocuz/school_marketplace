@@ -43,7 +43,7 @@ router.get('/my-store', requireLogin, requireSeller, async (req, res) => {
 
   const products = await all('SELECT * FROM products WHERE store_id = ?', [store.id]);
   const orders = await all(
-    "SELECT o.*, u.username as buyer_name, v.first_name, v.last_name, v.contact_number, v.facebook_link, v.student_id_photo " +
+    "SELECT o.*, o.user_id, u.username as buyer_name, v.first_name, v.last_name, v.contact_number, v.facebook_link, v.facebook_describe, v.student_id_photo, v.delivery_time, v.default_address " +
     "FROM orders o JOIN users u ON o.user_id = u.id " +
     "LEFT JOIN verifications v ON v.user_id = o.user_id " +
     "WHERE o.store_id = ? ORDER BY o.created_at DESC LIMIT 20",
@@ -105,7 +105,9 @@ router.post('/my-store/product/edit/:id', requireLogin, requireSeller, upload.si
 
 // DELETE PRODUCT
 router.post('/my-store/product/delete/:id', requireLogin, requireSeller, async (req, res) => {
-  await run('DELETE FROM products WHERE id = ?', [req.params.id]);
+  const store = await get('SELECT * FROM stores WHERE seller_id = ?', [req.session.userId]);
+  if (!store) { req.flash('error', 'Store not found.'); return res.redirect('/store/my-store'); }
+  await run('DELETE FROM products WHERE id = ? AND store_id = ?', [req.params.id, store.id]);
   req.flash('success', 'Product removed.');
   res.redirect('/store/my-store');
 });
@@ -128,6 +130,19 @@ router.post('/my-store/order/reject/:id', requireLogin, requireSeller, async (re
   await run("UPDATE orders SET status = 'rejected', notes = ? WHERE id = ?", [reason, order.id]);
   req.flash('success', 'Order rejected.');
   res.redirect('/store/my-store');
+});
+
+// SELLER: view buyer verification detail
+router.get('/my-store/buyer/:userId', requireLogin, requireSeller, async (req, res) => {
+  const store = await get('SELECT * FROM stores WHERE seller_id = ?', [req.session.userId]);
+  const buyer = await get('SELECT u.*, v.* FROM users u LEFT JOIN verifications v ON v.user_id = u.id WHERE u.id = ?', [req.params.userId]);
+  if (!buyer) { req.flash('error', 'Buyer not found.'); return res.redirect('/store/my-store'); }
+  const orders = await all(
+    'SELECT o.*, COUNT(oi.id) as item_count FROM orders o LEFT JOIN order_items oi ON oi.order_id = o.id WHERE o.user_id = ? AND o.store_id = ? GROUP BY o.id ORDER BY o.created_at DESC',
+    [req.params.userId, store.id]
+  );
+  const totalSpent = orders.filter(o => o.status === 'confirmed').reduce((s, o) => s + o.total_amount, 0);
+  res.render('store/buyer-detail', { buyer, orders, totalSpent, store });
 });
 
 // VIEW SINGLE STORE

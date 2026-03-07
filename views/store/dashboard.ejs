@@ -2,16 +2,19 @@
 
 <section class="page-header">
   <h1><%= store.name %> — Dashboard</h1>
+  <p>Manage your products and incoming orders.</p>
 </section>
 
 <!-- STORE STATS -->
-<div class="stats-grid">
+<div class="stats-grid" style="margin-bottom:30px;">
   <div class="stat-card">
-
     <div><h3><%= products.length %></h3><p>Products</p></div>
   </div>
   <div class="stat-card">
-    <div><h3><%= orders.length %></h3><p>Orders</p></div>
+    <div><h3><%= orders.length %></h3><p>Total Orders</p></div>
+  </div>
+  <div class="stat-card">
+    <div><h3><%= orders.filter(o => o.status === 'pending').length %></h3><p>Pending</p></div>
   </div>
   <div class="stat-card">
     <div><h3>₱<%= parseFloat(totalRevenue).toFixed(2) %></h3><p>Revenue</p></div>
@@ -19,16 +22,16 @@
 </div>
 
 <!-- ADD PRODUCT FORM -->
-<section>
+<section style="margin-bottom:36px;">
   <h2 class="section-title">Add New Product</h2>
   <form action="/store/my-store/product/add" method="POST" enctype="multipart/form-data" class="add-product-form">
     <div class="form-row">
       <div class="form-group">
-        <label>Product Name</label>
+        <label>Product Name *</label>
         <input type="text" name="name" placeholder="Product name" required>
       </div>
       <div class="form-group">
-        <label>Price (₱)</label>
+        <label>Price (₱) *</label>
         <input type="number" name="price" step="0.01" placeholder="0.00" required>
       </div>
       <div class="form-group">
@@ -42,17 +45,19 @@
         <input type="text" name="description" placeholder="Short description...">
       </div>
       <div class="form-group">
-        <label>Product Photo <span style="color:#888; font-size:0.82rem;">(optional)</span></label>
+        <label>Product Photo <span style="color:#aaa; font-size:0.82rem;">(optional)</span></label>
         <input type="file" name="product_image" accept="image/*">
         <small class="form-hint">JPG, PNG, WEBP — Max 5MB</small>
       </div>
     </div>
-    <button type="submit" class="btn btn-primary">Add Product</button>
+    <div style="display:flex; justify-content:flex-end;">
+      <button type="submit" class="btn btn-primary">Add Product</button>
+    </div>
   </form>
 </section>
 
 <!-- MY PRODUCTS -->
-<section>
+<section style="margin-bottom:36px;">
   <h2 class="section-title">My Products</h2>
   <% if (products.length === 0) { %>
     <p class="empty-msg">No products yet. Add some above!</p>
@@ -60,8 +65,6 @@
     <div class="products-grid">
       <% products.forEach(p => { %>
         <div class="product-card">
-
-          <!-- Product image -->
           <% if (p.image) { %>
             <div class="product-img-real">
               <img src="/uploads/<%= p.image %>" alt="<%= p.name %>">
@@ -69,31 +72,23 @@
           <% } else { %>
             <div class="product-img-placeholder">None</div>
           <% } %>
-
           <div class="product-body">
             <h3><%= p.name %></h3>
             <p><%= p.description || '' %></p>
-
             <div class="product-footer">
               <span class="price">₱<%= parseFloat(p.price).toFixed(2) %></span>
-              <!-- Stock badge — turns red when low -->
               <span class="stock-badge <%= p.stock === 0 ? 'out-of-stock' : p.stock <= 5 ? 'low-stock' : 'in-stock' %>">
-                <%= p.stock === 0 ? 'Out of stock' : `${p.stock} left` %>
+                <%= p.stock === 0 ? 'Out of stock' : p.stock + ' left' %>
               </span>
             </div>
-
-            <!-- Edit and Remove buttons -->
-            <div style="display:flex; gap:8px; margin-top:10px;">
-              <a href="/store/my-store/product/edit/<%= p.id %>" class="btn btn-sm btn-outline" style="flex:1; text-align:center;">
-                Edit
-              </a>
+            <div class="dash-btn-row">
+              <a href="/store/my-store/product/edit/<%= p.id %>" class="btn btn-sm btn-outline">Edit</a>
               <form action="/store/my-store/product/delete/<%= p.id %>" method="POST"
-                onsubmit="return confirm('Remove this product?')" style="flex:1;">
-                <button type="submit" class="btn btn-sm btn-danger" style="width:100%;">Remove</button>
+                onsubmit="return confirm('Remove this product?')">
+                <button type="submit" class="btn btn-sm btn-danger">Remove</button>
               </form>
             </div>
           </div>
-
         </div>
       <% }) %>
     </div>
@@ -106,88 +101,137 @@
   <% if (orders.length === 0) { %>
     <p class="empty-msg">No orders yet.</p>
   <% } else { %>
-    <% orders.forEach(order => { %>
-      <div class="order-card order-<%= order.status %>">
+    <div class="orders-list">
+      <% orders.forEach(order => { %>
+        <div class="order-card order-<%= order.status %>">
 
-        <!-- ORDER HEADER: status + date -->
-        <div class="order-header">
-          <span class="order-id">Order #<%= order.id %></span>
-          <span class="order-status status-<%= order.status %>"><%= order.status.toUpperCase() %></span>
-        </div>
+          <!-- ORDER HEADER -->
+          <div class="order-header">
+            <div>
+              <span class="order-id">Order #<%= order.id %></span>
+              <span class="order-date">
+                <%= new Date(order.created_at).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) %>
+              </span>
+            </div>
+            <span class="badge-status status-<%= order.status %>"><%= order.status.toUpperCase() %></span>
+          </div>
 
-        <!-- BUYER INFO BOX -->
-        <div class="buyer-info-box">
-          <div class="buyer-info-row">
-
-            <!-- Student ID photo -->
-            <% if (order.student_id_photo) { %>
-              <div class="buyer-id-photo">
-                <img src="/uploads/<%= order.student_id_photo %>" alt="Student ID">
-              </div>
-            <% } %>
-
-            <div class="buyer-details">
-              <div class="buyer-detail-item">
-                <span class="buyer-label">Name: </span>
-                <span style="color:rgb(103, 103, 255)"><%= order.first_name ? order.first_name + ' ' + order.last_name : order.buyer_name %></span>
-              </div>
-              <% if (order.contact_number) { %>
-              <div class="buyer-detail-item">
-                <span class="buyer-label">Contact: </span>
-                <span><a href="tel:<%= order.contact_number %>" style="color:rgb(103, 103, 255)"><%= order.contact_number %></a></span>
-              </div>
+          <!-- BUYER INFO -->
+          <div class="buyer-info-box">
+            <div class="buyer-info-row">
+              <% if (order.student_id_photo) { %>
+                <div class="buyer-id-photo">
+                  <img src="/uploads/<%= order.student_id_photo %>" alt="ID Photo">
+                </div>
               <% } %>
-              <% if (order.facebook_link) { %>
-              <div class="buyer-detail-item">
-                <span class="buyer-label">Facebook: </span>
-                <span><a href="<%= order.facebook_link %>" target="_blank" style="color:rgb(103, 103, 255)">View Profile</a></span>
+              <div class="buyer-details">
+                <div class="buyer-detail-item">
+                  <span class="buyer-label">Name</span>
+                  <span><strong><%= order.first_name ? order.first_name + ' ' + order.last_name : order.buyer_name %></strong>
+                    <a href="/store/my-store/buyer/<%= order.user_id %>" class="btn btn-sm btn-outline" style="margin-left:8px; padding:2px 10px; font-size:0.75rem;">View Full Profile</a>
+                  </span>
+                </div>
+                <% if (order.contact_number) { %>
+                  <div class="buyer-detail-item">
+                    <span class="buyer-label">Contact</span>
+                    <span><a href="tel:<%= order.contact_number %>"><%= order.contact_number %></a></span>
+                  </div>
+                <% } %>
+                <% if (order.facebook_link) { %>
+                  <div class="buyer-detail-item">
+                    <span class="buyer-label">Facebook</span>
+                    <span><a href="<%= order.facebook_link %>" target="_blank">View Profile</a>
+                    <% if (order.facebook_describe) { %><small style="color:var(--text-muted); margin-left:6px;">(<%= order.facebook_describe %>)</small><% } %></span>
+                  </div>
+                <% } %>
+                <% if (order.delivery_time) { %>
+                  <div class="buyer-detail-item">
+                    <span class="buyer-label">Pref. Time</span>
+                    <span><%= order.delivery_time %></span>
+                  </div>
+                <% } %>
               </div>
-              <% } %>
             </div>
           </div>
-        </div>
 
-        <!-- DELIVERY ADDRESS -->
-        <% if (order.notes) { %>
-          <div class="delivery-address-box">
-            <span style="font-size:0.82rem; font-weight:600; color:#1e40af;"><%= new Date(order.created_at).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' }) %></span><br>
-            <span style="font-size:0.88rem; color:#1e40af;"><%= order.notes %></span>
-          </div>
-        <% } %>
+          <!-- DELIVERY ADDRESS -->
+          <% if (order.notes) { %>
+            <div class="delivery-address-box"><%= order.notes %></div>
+          <% } %>
 
-        <!-- ORDER ITEMS -->
-        <div class="order-items" style="margin-top:10px;">
-          <% order.items.forEach(item => { %>
-            <div class="order-item-line">
-              <span><%= item.product_name %> x<%= item.quantity %></span>
-              <span>₱<%= (item.price_at_order * item.quantity).toFixed(2) %></span>
+          <!-- ORDER ITEMS -->
+          <div class="order-items" style="margin-top:12px;">
+            <% order.items.forEach(item => { %>
+              <div class="order-item-line">
+                <span><%= item.product_name %> x<%= item.quantity %></span>
+                <span>₱<%= (item.price_at_order * item.quantity).toFixed(2) %></span>
+              </div>
+            <% }) %>
+            <div class="order-item-line" style="font-weight:700; border-top:1px solid var(--border); margin-top:6px; padding-top:6px;">
+              <span>Total</span>
+              <span>₱<%= parseFloat(order.total_amount).toFixed(2) %></span>
             </div>
-          <% }) %>
-        </div>
+          </div>
 
-        <!-- ORDER FOOTER -->
-        <div class="order-footer">
-          <strong>Total: ₱<%= parseFloat(order.total_amount).toFixed(2) %></strong>
-
+          <!-- ACTION BUTTONS -->
           <% if (order.status === 'pending') { %>
-            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px;">
-              <form action="/store/my-store/order/confirm/<%= order.id %>" method="POST">
-                <button type="submit" class="btn btn-sm btn-success">Confirm</button>
+            <div class="order-actions">
+              <form action="/store/my-store/order/reject/<%= order.id %>" method="POST" class="reject-form">
+                <input type="text" name="reject_reason" placeholder="Reason for rejection (optional)"
+                  class="reject-input" style="flex:1; min-width:0;">
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Reject this order?')">Reject</button>
               </form>
-              <form action="/store/my-store/order/reject/<%= order.id %>" method="POST"
-                onsubmit="return confirm('Reject this order?')"
-                style="display:flex; gap:6px; align-items:center;">
-                <input type="text" name="reject_reason" placeholder="Reason (optional)"
-                  style="padding:5px 10px; border:2px solid #ddd; border-radius:6px; font-size:0.83rem; width:160px;">
-                <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+              <form action="/store/my-store/order/confirm/<%= order.id %>" method="POST">
+                <button type="submit" class="btn btn-sm btn-success">Confirm Order</button>
               </form>
             </div>
           <% } %>
-        </div>
 
-      </div>
-    <% }) %>
+        </div>
+      <% }) %>
+    </div>
   <% } %>
 </section>
+
+<style>
+.dash-btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  justify-content: flex-end;
+}
+.dash-btn-row form { margin: 0; }
+.dash-btn-row .btn { flex: 1; text-align: center; }
+
+.order-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+}
+.reject-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 1;
+  min-width: 240px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .order-actions { flex-direction: column; }
+  .reject-form { width: 100%; }
+  .reject-input { width: 100% !important; }
+  .order-actions .btn { width: 100%; text-align: center; }
+  .buyer-info-row { flex-direction: column; }
+  .buyer-id-photo img { width: 100% !important; height: 160px !important; }
+  .dash-btn-row .btn { font-size: 0.8rem; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
 
 <%- include('../partials/footer') %>

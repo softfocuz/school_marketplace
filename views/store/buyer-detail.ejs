@@ -1,0 +1,119 @@
+<%- include('../partials/header') %>
+
+<section class="page-header">
+  <h1>Buyer Profile</h1>
+  <p>Full verification details for this buyer.</p>
+</section>
+
+<div style="max-width:900px;">
+
+  <a href="/store/my-store" class="btn btn-outline btn-sm" style="margin-bottom:20px; display:inline-block;">Back to Dashboard</a>
+
+  <!-- BUYER SUMMARY CARD -->
+  <div style="background:var(--card-bg); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow); margin-bottom:24px;">
+    <div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap;">
+
+      <% if (buyer.student_id_photo) { %>
+        <img src="/uploads/<%= buyer.student_id_photo %>" alt="ID Photo"
+          style="width:120px; height:120px; object-fit:cover; border-radius:10px; border:2px solid var(--border); flex-shrink:0;">
+      <% } else { %>
+        <div style="width:120px; height:120px; background:#f0f0f0; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:3rem; flex-shrink:0;">👤</div>
+      <% } %>
+
+      <div style="flex:1; min-width:200px;">
+        <h2 style="font-family:'Syne',sans-serif; margin-bottom:4px;"><%= buyer.first_name %> <%= buyer.last_name %></h2>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:12px;">@<%= buyer.username %></p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <span class="badge-status <%= buyer.status === 'approved' ? 'status-approved' : buyer.status === 'rejected' ? 'status-rejected' : 'status-pending' %>">
+            <%= (buyer.status || 'pending').toUpperCase() %>
+          </span>
+          <span class="badge-status" style="background:#e0e7ff; color:#3730a3;">
+            <%= buyer.buyer_type === 'nonstudent' ? 'Non-Student' : 'Student' %>
+          </span>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <div style="text-align:center; background:var(--bg); padding:14px 20px; border-radius:10px;">
+          <div style="font-size:1.4rem; font-weight:700; font-family:'Syne',sans-serif;"><%= orders.length %></div>
+          <div style="font-size:0.78rem; color:var(--text-muted);">Total Orders</div>
+        </div>
+        <div style="text-align:center; background:var(--bg); padding:14px 20px; border-radius:10px;">
+          <div style="font-size:1.4rem; font-weight:700; font-family:'Syne',sans-serif;">₱<%= parseFloat(totalSpent).toFixed(2) %></div>
+          <div style="font-size:0.78rem; color:var(--text-muted);">Total Spent</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAILS GRID -->
+  <div class="detail-grid" style="margin-bottom:24px;">
+
+    <!-- CONTACT INFO -->
+    <div class="detail-section">
+      <h3>Contact Information</h3>
+      <table class="detail-table">
+        <tr><td>Contact No.</td><td><a href="tel:<%= buyer.contact_number %>"><%= buyer.contact_number || 'N/A' %></a></td></tr>
+        <tr><td>Facebook</td><td>
+          <% if (buyer.facebook_link) { %>
+            <a href="<%= buyer.facebook_link %>" target="_blank">View Profile</a><br>
+            <small style="color:var(--text-muted);"><%= buyer.facebook_describe %></small>
+          <% } else { %>N/A<% } %>
+        </td></tr>
+        <tr><td>Delivery Time</td><td><%= buyer.delivery_time || 'Not specified' %></td></tr>
+        <tr><td>Preferred Day</td><td><%= buyer.preferred_date || 'Not specified' %></td></tr>
+        <tr><td>Default Address</td><td><%= buyer.default_address || 'Not set' %></td></tr>
+      </table>
+    </div>
+
+    <!-- BACKGROUND INFO -->
+    <div class="detail-section">
+      <h3><%= buyer.buyer_type === 'nonstudent' ? 'Occupation Details' : 'Student Details' %></h3>
+      <table class="detail-table">
+        <% if (buyer.buyer_type === 'nonstudent') { %>
+          <tr><td>Occupation</td><td><%= buyer.occupation || 'N/A' %></td></tr>
+          <tr><td>Workplace</td><td><%= buyer.workplace || 'N/A' %></td></tr>
+          <tr><td>Home Address</td><td><%= buyer.home_address || 'N/A' %></td></tr>
+        <% } else { %>
+          <tr><td>School</td><td><%= buyer.school || 'N/A' %></td></tr>
+          <tr><td>Year Level</td><td><%= buyer.year_level || 'N/A' %></td></tr>
+          <tr><td>Course</td><td><%= buyer.course || 'N/A' %></td></tr>
+          <tr><td>Schedule</td><td><%= buyer.schedule || 'N/A' %></td></tr>
+        <% } %>
+      </table>
+    </div>
+  </div>
+
+  <!-- ORDER HISTORY WITH THIS STORE -->
+  <div style="background:var(--card-bg); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; margin-bottom:24px;">
+    <div style="padding:16px 20px; border-bottom:1px solid var(--border);">
+      <h3 style="font-family:'Syne',sans-serif; font-size:1rem;">Order History with Your Store</h3>
+    </div>
+    <% if (orders.length === 0) { %>
+      <p class="empty-msg" style="padding:20px;">No orders yet from this buyer.</p>
+    <% } else { %>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr><th>Order #</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <% orders.forEach(order => { %>
+              <tr>
+                <td>#<%= order.id %></td>
+                <td><%= new Date(order.created_at).toLocaleDateString('en-PH') %></td>
+                <td><%= order.item_count %> item(s)</td>
+                <td>₱<%= parseFloat(order.total_amount).toFixed(2) %></td>
+                <td><span class="badge-status status-<%= order.status %>"><%= order.status.toUpperCase() %></span></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+
+</div>
+
+<%- include('../partials/footer') %>

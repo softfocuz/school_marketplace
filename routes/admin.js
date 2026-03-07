@@ -38,14 +38,16 @@ router.get("/verifications/:id", async (req, res) => {
 });
 
 router.post("/verifications/:id/approve", async (req, res) => {
-  await run("UPDATE verifications SET status='approved', reviewed_at=CURRENT_TIMESTAMP, admin_note=NULL WHERE id=?", [req.params.id]);
-  req.flash("success", "Verification approved!");
+  await run("UPDATE verifications SET status='approved', reviewed_at=CURRENT_TIMESTAMP, admin_note=NULL, buyer_rejection_note=NULL WHERE id=?", [req.params.id]);
+  req.flash("success", "Buyer verified and approved!");
   res.redirect("/admin/verifications");
 });
 
 router.post("/verifications/:id/reject", async (req, res) => {
-  await run("UPDATE verifications SET status='rejected', reviewed_at=CURRENT_TIMESTAMP, admin_note=? WHERE id=?", [req.body.admin_note || "No reason given.", req.params.id]);
-  req.flash("success", "Verification rejected.");
+  const reason = req.body.admin_note || "No reason given.";
+  await run("UPDATE verifications SET status='rejected', reviewed_at=CURRENT_TIMESTAMP, admin_note=?, buyer_rejection_note=? WHERE id=?",
+    [reason, reason, req.params.id]);
+  req.flash("success", "Buyer verification rejected.");
   res.redirect("/admin/verifications");
 });
 

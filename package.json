@@ -1,5 +1,5 @@
 {
-  "name": "Jikart",
+  "name": "jikart",
   "version": "1.0.0",
   "description": "School Marketplace Website",
   "main": "app.js",
@@ -8,16 +8,28 @@
     "dev": "nodemon app.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "express-session": "^1.17.3",
     "bcryptjs": "^2.4.3",
-    "multer": "^1.4.5-lts.1",
-    "sqlite3": "^5.1.6",
-    "ejs": "^3.1.9",
     "connect-flash": "^0.1.1",
-    "express-validator": "^7.0.1"
+    "ejs": "^3.1.9",
+    "express": "^4.22.1",
+    "express-session": "^1.19.0",
+    "express-validator": "^7.0.1",
+    "multer": "^1.4.5-lts.1",
+    "sqlite3": "^5.1.6"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/softfocuz/school_marketplace.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/softfocuz/school_marketplace/issues"
+  },
+  "homepage": "https://github.com/softfocuz/school_marketplace#readme"
 }
